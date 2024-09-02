@@ -13,10 +13,17 @@ app.post('/combine-images', upload.array('images', 3), async (req, res) => {
 
     const buffers = (req.files as Express.Multer.File[]).map(file => file.buffer);
     
-    const combinedImage = await sharp(buffers[0])
+    // Resize all images to a consistent size (e.g., 1000x1000 pixels)
+    const resizedBuffers = await Promise.all(buffers.map(buffer => 
+      sharp(buffer)
+        .resize(1000, 1000, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 0 } })
+        .toBuffer()
+    ));
+    
+    const combinedImage = await sharp(resizedBuffers[0])
       .composite([
-        { input: buffers[1], gravity: 'center' },
-        { input: buffers[2], gravity: 'center' }
+        { input: resizedBuffers[1], gravity: 'center' },
+        { input: resizedBuffers[2], gravity: 'center' }
       ])
       .jpeg()
       .toBuffer();

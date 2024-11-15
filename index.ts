@@ -5,10 +5,10 @@ import sharp from 'sharp';
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
-app.post('/combine-images', upload.array('images', 3), async (req, res) => {
+app.post('/combine-images', upload.array('images', 5), async (req, res) => {
   try {
-    if (!req.files || req.files.length !== 3) {
-      return res.status(400).json({ error: 'Please upload exactly 3 images.' });
+    if (!req.files || req.files.length !== 5) {
+      return res.status(400).json({ error: 'Please upload exactly 5 images.' });
     }
 
     const buffers = (req.files as Express.Multer.File[]).map(file => file.buffer);
@@ -23,7 +23,9 @@ app.post('/combine-images', upload.array('images', 3), async (req, res) => {
     const combinedImage = await sharp(resizedBuffers[0])
       .composite([
         { input: resizedBuffers[1], gravity: 'center' },
-        { input: resizedBuffers[2], gravity: 'center' }
+        { input: resizedBuffers[2], gravity: 'center' },
+        { input: resizedBuffers[3], gravity: 'center' },
+        { input: resizedBuffers[4], gravity: 'center' }
       ])
       .jpeg()
       .toBuffer();

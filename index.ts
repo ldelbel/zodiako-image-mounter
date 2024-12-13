@@ -1,8 +1,8 @@
 import express from 'express';
-import multer from 'multer';
-import sharp from 'sharp';
 import fs from 'fs';
+import multer from 'multer';
 import path from 'path';
+import sharp from 'sharp';
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -22,7 +22,7 @@ app.post('/combine-images', upload.array('images', 5), async (req, res) => {
       buffers.map((buffer) =>
         sharp(buffer)
           .resize(1000, 1000, {
-            fit: 'contain',
+            fit: 'cover',
             background: { r: 255, g: 255, b: 255, alpha: 0 },
           })
           .toBuffer()
@@ -71,7 +71,7 @@ app.get('/', async (req, res) => {
     const resizedBuffers = await Promise.all(
       buffers.map((buffer) =>
         sharp(buffer)
-          .resize(1000, 1000, {
+          .resize(1200, 1200, {
             fit: 'contain',
             background: { r: 255, g: 255, b: 255, alpha: 0 },
           })
@@ -79,12 +79,44 @@ app.get('/', async (req, res) => {
       )
     );
 
-    const combinedImage = await sharp(resizedBuffers[0])
+    const resizedBuffer0 = await sharp(resizedBuffers[0])
+      .resize(1200, 1200) // Example new size for buffer 1
+      .toBuffer();
+    // Resize specific buffers
+    const resizedBuffer1 = await sharp(resizedBuffers[1])
+      .resize(280, 280) // Example new size for buffer 1
+      .toBuffer();
+
+    const resizedBuffer2 = await sharp(resizedBuffers[2])
+      .resize(280, 280) // Example new size for buffer 2
+      .toBuffer();
+
+    const resizedBuffer3 = await sharp(resizedBuffers[3])
+      .resize(380, 380) // Example new size for buffer 3
+      .toBuffer();
+
+    const resizedBuffer4 = await sharp(resizedBuffers[4])
+      .resize(1200, 1200) // Example new size for buffer 4
+      .toBuffer();
+
+    const combinedImage = await sharp(resizedBuffer0)
       .composite([
-        { input: resizedBuffers[1], gravity: 'center' },
-        { input: resizedBuffers[2], gravity: 'center' },
-        { input: resizedBuffers[3], gravity: 'center' },
-        { input: resizedBuffers[4], gravity: 'center' },
+        { input: resizedBuffer4, gravity: 'center' },
+        {
+          input: resizedBuffer1,
+          top: 940,
+          left: 710,
+        },
+        {
+          input: resizedBuffer2,
+          top: 940,
+          left: 220,
+        },
+        {
+          input: resizedBuffer3,
+          top: 880,
+          left: 450,
+        },
       ])
       .jpeg()
       .toBuffer();

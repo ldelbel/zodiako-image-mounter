@@ -53,13 +53,13 @@ app.get('/', async (req, res) => {
     const folderPath = path.join(__dirname, './images'); // Specify your local folder path
     const files = fs
       .readdirSync(folderPath)
-      .filter((file) => /\.(jpg|jpeg|png|gif)$/.test(file)); // Filter for image files
+      .filter((file) => /\.(jpg|jpeg|png|gif)$/.test(file)).sort(); // Filter for image files
 
-    if (files.length !== 5) {
+    if (files.length !== 6) {
       return res
         .status(400)
         .json({
-          error: 'Please ensure there are exactly 5 images in the folder.',
+          error: 'Please ensure there are exactly 6 images in the folder.',
         });
     }
 
@@ -84,36 +84,41 @@ app.get('/', async (req, res) => {
       .toBuffer();
     // Resize specific buffers
     const resizedBuffer1 = await sharp(resizedBuffers[1])
-      .resize(280, 280) // Example new size for buffer 1
+      .resize(1100, 1100) // Example new size for buffer 1
       .toBuffer();
 
     const resizedBuffer2 = await sharp(resizedBuffers[2])
-      .resize(280, 280) // Example new size for buffer 2
+      .resize(1200, 1200) // Example new size for buffer 2
       .toBuffer();
 
     const resizedBuffer3 = await sharp(resizedBuffers[3])
-      .resize(380, 380) // Example new size for buffer 3
+      .resize(280, 280) // Example new size for buffer 3
       .toBuffer();
 
     const resizedBuffer4 = await sharp(resizedBuffers[4])
-      .resize(1200, 1200) // Example new size for buffer 4
+      .resize(280, 280) // Example new size for buffer 4
+      .toBuffer();
+
+    const resizedBuffer5 = await sharp(resizedBuffers[5])
+      .resize(380, 380) // Example new size for buffer 4
       .toBuffer();
 
     const combinedImage = await sharp(resizedBuffer0)
       .composite([
-        { input: resizedBuffer4, gravity: 'center' },
+        { input: resizedBuffer1, gravity: 'center' },
+        { input: resizedBuffer2, gravity: 'center' },
         {
-          input: resizedBuffer1,
+          input: resizedBuffer3,
           top: 940,
           left: 710,
         },
         {
-          input: resizedBuffer2,
+          input: resizedBuffer4,
           top: 940,
           left: 220,
         },
         {
-          input: resizedBuffer3,
+          input: resizedBuffer5,
           top: 880,
           left: 450,
         },
